@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using API.Extensions;
 using StackExchange.Redis;
+using Infrastructure.Identity;
 
 namespace API
 {
@@ -32,12 +33,18 @@ namespace API
             {
                 x.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
+
+            services.AddDbContext<AppIdentityDbContext>( x=>
+            {
+                x.UseSqlite(_config.GetConnectionString("IdentityConnection"));
+            });
             services.AddSingleton<IConnectionMultiplexer>( c => {
                 var configuration = ConfigurationOptions.Parse(_config
                 .GetConnectionString("Redis"), true);
                 return ConnectionMultiplexer.Connect(configuration);
             });
             services.AddApplicationServices();
+            services.AddIdentityServices(_config);
 
             services.AddSwaggerDocumentation();
             services.AddCors(opt =>
@@ -64,6 +71,8 @@ namespace API
             app.UseStaticFiles();
 
             app.UseCors("CorsPolicy");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
