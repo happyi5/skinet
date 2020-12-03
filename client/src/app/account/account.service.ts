@@ -5,6 +5,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { ReplaySubject } from 'rxjs/internal/ReplaySubject';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { IAddress } from '../shared/models/address';
 import { IUser } from '../shared/models/user';
 
 @Injectable({
@@ -45,6 +46,14 @@ export class AccountService {
         }
       })
     );
+  }
+
+  getUserAddress() {
+    return this.http.get<IAddress>(this.baseUrl + 'account/address');
+  }
+
+  updateUserAddress(address: IAddress) {
+    return this.http.put<IAddress>(this.baseUrl + 'account/address', address);
   }
 
   register(values: any) {
